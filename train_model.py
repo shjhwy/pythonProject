@@ -1,9 +1,10 @@
 import model.transformer as transformer
+import model.lenet as lenet
 import data_set_machine_translate as transformer_data
 import paddle
 
 
-def trainTransformer(epochs:int,data_loader:paddle.io.DataLoader):
+def train_transformer(epochs:int,data_loader:paddle.io.DataLoader):
     """
     训练 transformer
     :param epochs: 迭代次数
@@ -45,3 +46,34 @@ def trainTransformer(epochs:int,data_loader:paddle.io.DataLoader):
             optimizer.clear_grad()  # 在反向传播之前，清除（归零）之前的梯度信息
             loss.backward()  # 对损失进行反向传播计算，自动计算模型参数的梯度。
             optimizer.step()  # 使用优化器更新模型的权重，以最小化损失函数。
+
+def train_lenet(epochs:int,data_loader:paddle.io.DataLoader):
+    # 创建模型
+    model = lenet.MNIST()
+
+    # 设置优化器
+    opt = paddle.optimizer.SGD(learning_rate=0.001, parameters=model.parameters())
+
+    for epoch_id in range(epochs):
+        model.train()
+        for batch_id, data in enumerate(data_loader()):
+            # 准备数据
+            images, labels = data
+
+            # 前向计算的过程
+            predicts = model(images)
+
+            # 计算损失，取一个批次样本损失的平均值
+            loss = paddle.nn.functional.cross_entropy(predicts, labels)
+            avg_loss = paddle.mean(loss)
+
+            # 每训练了 100 批次的数据，打印下当前 Loss 的情况
+            if batch_id % 200 == 0:
+                print("epoch: {}, batch: {}, loss is: {}".format(epoch_id, batch_id, avg_loss.numpy()))
+
+            # 后向传播，更新参数的过程
+            avg_loss.backward()
+            # 最小化 loss,更新参数
+            opt.step()
+            # 清除梯度
+            opt.clear_grad()

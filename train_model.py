@@ -49,10 +49,15 @@ def train_test_transformer(epochs:int, data_loader:paddle.io.DataLoader):
             optimizer.step()  # 使用优化器更新模型的权重，以最小化损失函数。
 
     # 训练完成（这里是遍历完全部epoches才算训练完成，实际上可以单独划一个验证集，判断验证集上的指标决定是否训练完成）
-    # 保存模型
-    model.save('save_model/finish_train')
+    # 保存Layer参数
+
+
+    paddle.save(model.state_dict(), "save_model/transformer/linear_net.pdparams")
+    # 保存优化器参数
+    paddle.save(optimizer.state_dict(), "save_opt/transformer/adam.pdopt")
 
     # 调用测试方法，验证在测试集（这里用的同一个数据集）上的效果
+    # 还没有用paddle的语法重写好，有问题的
     test_model.test_transformer(data_loader,model)
 
 

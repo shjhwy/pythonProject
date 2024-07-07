@@ -53,9 +53,9 @@ def test_transformer(test_data: paddle.io.DataLoader, model: Transformer):
     enc_inputs, _, _ = next(iter(test_data))
     for i in range(len(enc_inputs)):
         # 通过贪婪算法，逐步获得解码器的完整输入
-        greedy_dec_input = greedy_decoder(model, enc_inputs[i].view(1, -1), start_symbol=tgt_vocab["S"])
+        greedy_dec_input = greedy_decoder(model, enc_inputs[i].reshape([1, -1]), start_symbol=tgt_vocab["S"])
         # 通过模型预测最终的词汇索引
-        predict, _, _, _ = model(enc_inputs[i].view(1, -1), greedy_dec_input)
+        predict, _, _, _ = model(enc_inputs[i].reshape([1, -1]), greedy_dec_input)
         # 将预测的索引转换为实际的词汇，并打印出来。
-        predict = predict.data.max(1, keepdim=True)[1]
+        predict = predict.data.max(1, keepdims=True)[1]
         print(enc_inputs[i], '->', [idx2word[n.item()] for n in predict.squeeze()])

@@ -1,10 +1,11 @@
-import model.transformer as transformer
+import model.transformer_mine as transformer
 import model.lenet as lenet
 import data_set_machine_translate as transformer_data
+import test_model
 import paddle
 
 
-def train_transformer(epochs:int,data_loader:paddle.io.DataLoader):
+def train_test_transformer(epochs:int, data_loader:paddle.io.DataLoader):
     """
     训练 transformer
     :param epochs: 迭代次数
@@ -46,6 +47,14 @@ def train_transformer(epochs:int,data_loader:paddle.io.DataLoader):
             optimizer.clear_grad()  # 在反向传播之前，清除（归零）之前的梯度信息
             loss.backward()  # 对损失进行反向传播计算，自动计算模型参数的梯度。
             optimizer.step()  # 使用优化器更新模型的权重，以最小化损失函数。
+
+    # 训练完成（这里是遍历完全部epoches才算训练完成，实际上可以单独划一个验证集，判断验证集上的指标决定是否训练完成）
+    # 保存模型
+    model.save('save_model/finish_train')
+
+    # 调用测试方法，验证在测试集（这里用的同一个数据集）上的效果
+    test_model.test_transformer(data_loader,model)
+
 
 def train_lenet(epochs:int,data_loader:paddle.io.DataLoader):
     # 创建模型
